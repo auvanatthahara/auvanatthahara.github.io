@@ -86,6 +86,7 @@ a:focus {
     position: relative;
     height: 90px;
     background: var(--primary);
+    font-family: 'Poppin', sans-serif;
 }
 
 .top-bar .logo {
@@ -96,7 +97,7 @@ a:focus {
 
 .top-bar .logo h1 {
     margin: 0;
-    color: #030f27;
+    color: var(--secondary);
     font-size: 60px;
     line-height: 60px;
     font-weight: 700;
