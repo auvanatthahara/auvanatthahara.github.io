@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auvan Atthahara — Software & Data Engineer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: #1e1e2e;
+      --accent: #7c6aff;
+      --accent2: #00e5c3;
+      --text: #e8e8f0;
+      --muted: #6b6b80;
+      --card: #14141f;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 14px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.4;
+    }
+
+    /* ── GRID LINES ── */
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── GLOW BLOBS ── */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .blob-1 { width: 400px; height: 400px; background: rgba(124,106,255,0.12); top: -100px; left: -100px; }
+    .blob-2 { width: 350px; height: 350px; background: rgba(0,229,195,0.08); bottom: 100px; right: -80px; }
+
+    /* ── LAYOUT ── */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 32px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 20px 0;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    nav .inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 17px;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent2); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 0 60px;
+    }
+    .hero-tag {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      border: 1px solid rgba(0,229,195,0.3);
+      padding: 4px 12px;
+      border-radius: 2px;
+      margin-bottom: 28px;
+      animation: fadeUp 0.6s ease both;
+    }
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(42px, 8vw, 80px);
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+      animation: fadeUp 0.7s 0.1s ease both;
+    }
+    .hero h1 .line2 { color: var(--accent); }
+    .hero-sub {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 480px;
+      margin-bottom: 44px;
+      animation: fadeUp 0.7s 0.2s ease both;
+      line-height: 1.8;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      animation: fadeUp 0.7s 0.3s ease both;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 3px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover { background: #9080ff; transform: translateY(-1px); }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover { border-color: var(--accent2); color: var(--accent2); }
+
+    /* status pill */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,229,195,0.06);
+      border: 1px solid rgba(0,229,195,0.18);
+      border-radius: 2px;
+      padding: 6px 14px;
+      font-size: 11px;
+      color: var(--accent2);
+      margin-top: 48px;
+      animation: fadeUp 0.7s 0.4s ease both;
+    }
+    .status-dot {
+      width: 6px; height: 6px;
+      background: var(--accent2);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ── SECTION ── */
+    section { padding: 90px 0; }
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 48px;
+    }
+    .divider {
+      width: 40px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      margin-bottom: 48px;
+    }
+
+    /* ── ABOUT ── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+    .about-text p { color: var(--muted); margin-bottom: 16px; }
+    .about-text p strong { color: var(--text); }
+    .info-list { list-style: none; }
+    .info-list li {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .info-list li .label { color: var(--muted); font-size: 11px; letter-spacing: 0.05em; }
+    .info-list li .value { color: var(--text); text-align: right; }
+
+    /* ── SKILLS ── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .skill-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 20px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .skill-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .skill-icon { font-size: 22px; margin-bottom: 10px; }
+    .skill-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+    .skill-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .tag {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 2px;
+      background: rgba(124,106,255,0.1);
+      color: var(--accent);
+      letter-spacing: 0.05em;
+    }
+    .tag.green {
+      background: rgba(0,229,195,0.08);
+      color: var(--accent2);
+    }
+
+    /* ── PROJECTS ── */
+    .projects-list { display: flex; flex-direction: column; gap: 20px; }
+    .project-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 28px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: start;
+      transition: border-color 0.2s;
+    }
+    .project-card:hover { border-color: var(--accent2); }
+    .project-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .project-desc { color: var(--muted); font-size: 13px; margin-bottom: 16px; line-height: 1.8; }
+    .project-stack { display: flex; flex-wrap: wrap; gap: 8px; }
+    .stack-chip {
+      font-size: 10px;
+      padding: 3px 10px;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+    .project-links { display: flex; flex-direction: column; gap: 8px; }
+    .project-links a {
+      font-size: 11px;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      transition: color 0.2s;
+    }
+    .project-links a:hover { color: var(--accent2); }
+
+    /* ── EXPERIENCE ── */
+    .exp-list { display: flex; flex-direction: column; gap: 0; }
+    .exp-item {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 24px;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .exp-date { color: var(--muted); font-size: 12px; padding-top: 3px; }
+    .exp-role {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+    .exp-company { color: var(--accent2); font-size: 12px; margin-bottom: 10px; }
+    .exp-desc { color: var(--muted); font-size: 13px; line-height: 1.8; }
+
+    /* ── CONTACT ── */
+    .contact-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 48px;
+      text-align: center;
+    }
+    .contact-box h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 12px;
+    }
+    .contact-box p { color: var(--muted); margin-bottom: 32px; }
+    .contact-links { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+    .contact-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+    .contact-link:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .about-grid { grid-template-columns: 1fr; }
+      .exp-item { grid-template-columns: 1fr; gap: 4px; }
+      .project-card { grid-template-columns: 1fr; }
+      .project-links { flex-direction: row; }
+      .contact-box { padding: 28px 20px; }
+    }
+    /* ── TRACK TABS ── */
+    .track-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+    .track-tab {
+      padding: 7px 18px;
+      border-radius: 2px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+    .track-tab:hover { border-color: var(--accent); color: var(--accent); }
+    .track-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* ── TRACK BADGES ── */
+    .track-badge, .proj-track {
+      display: inline-block;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 2px;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+    .de-badge {
+      background: rgba(0,229,195,0.1);
+      color: var(--accent2);
+      border: 1px solid rgba(0,229,195,0.25);
+    }
+    .swe-badge {
+      background: rgba(124,106,255,0.1);
+      color: var(--accent);
+      border: 1px solid rgba(124,106,255,0.25);
+    }
+    .project-meta { margin-bottom: 4px; }
+
+    /* hide filtered cards */
+    .skill-card.hidden, .project-card.hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="inner">
+      <a href="#" class="logo">A<span>.</span>atthahara</a>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="container">
+    <section class="hero" id="home">
+      <div>
+        <div class="hero-tag">Software Engineer · ETL & Data Pipelines</div>
+        <h1>
+          Auvan<br>
+          <span class="line2">Atthahara</span>
+        </h1>
+        <p class="hero-sub">
+          2+ years building backend microservices and ETL workflows — from
+          Java Spring Boot APIs to SSIS pipelines in the insurance sector.
+          Strong software foundation applied to reliable data systems.
+        </p>
+        <div class="hero-actions">
+          <a href="#projects" class="btn btn-primary">View Projects</a>
+          <a href="#contact" class="btn btn-outline">Get in touch</a>
+          <a href="resume.pdf" class="btn btn-outline" target="_blank">↓ Resume</a>
+        </div>
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          Open to Software & Data Engineering roles
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="reveal">
+      <div class="section-label">01 — About</div>
+      <h2 class="section-title">Who I am</h2>
+      <div class="about-grid">
+        <div class="about-text">
+          <p>
+            I'm a <strong>Software Engineer</strong> with 2+ years bridging backend
+            development and data pipeline work. Currently at
+            <strong>PT. Asuransi BRILife</strong>, I design and maintain SSIS-based
+            ETL workflows for insurance transaction data while also building and
+            maintaining microservices for the MoKlaim claims platform.
+          </p>
+          <p>
+            Before that, I built backend HRIS systems and payroll modules at
+            <strong>PT. Lawencon International</strong> using Spring Boot, PostgreSQL,
+            and Angular — and completed an intensive Data Engineering bootcamp covering
+            ETL pipelines, data warehousing, and SQL-based transformation.
+          </p>
+          <p>
+            I'm equally comfortable writing a stored procedure and scaffolding a
+            REST API. I hold an <strong>AWS Cloud Practitioner</strong> certification
+            (in progress) and am deepening my modern data stack skills.
+          </p>
+        </div>
+        <ul class="info-list">
+          <li><span class="label">Phone</span><span class="value">(+62) 895-2162-4446</span></li>
+          <li><span class="label">Email</span><span class="value">auvanatthahara@gmail.com</span></li>
+          <li><span class="label">Current Role</span><span class="value">Software Engineer</span></li>
+          <li><span class="label">Company</span><span class="value">PT. Asuransi BRILife</span></li>
+          <li><span class="label">Education</span><span class="value">B.Eng Electrical, Untirta '22</span></li>
+          <li><span class="label">Certification</span><span class="value">AWS CCP (in progress)</span></li>
+          <li><span class="label">HackerRank</span><span class="value">SQL · Java · Python</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills" class="reveal">
+      <div class="section-label">02 — Skills</div>
+      <h2 class="section-title">Technical stack</h2>
+
+      <div class="track-tabs">
+        <button class="track-tab active" data-track="all">All</button>
+        <button class="track-tab" data-track="de">Data Engineering</button>
+        <button class="track-tab" data-track="swe">Software Engineering</button>
+      </div>
+
+      <div class="skills-grid">
+        <div class="skill-card" data-track="de">
+          <div class="skill-icon">🔄</div>
+          <div class="skill-name">ETL & Data Pipelines</div>
+          <div class="track-badge de-badge">Data Eng</div>
+          <div class="skill-tags">
+            <span class="tag">SSIS</span>
+            <span class="tag">ETL Workflow Design</span>
+            <span class="tag">Staging & Transformation</span>
+            <span class="tag">Pipeline Reliability</span>
+          </div>
+        </div>
+        <div class="skill-card" data-track="de">
+          <div class="skill-icon">🗄️</div>
+          <div class="skill-name">Databases & Warehousing</div>
+          <div class="track-badge de-badge">Data Eng</div>
+          <div class="skill-tags">
+            <span class="tag">SQL Server</span>
+            <span class="tag">PostgreSQL</span>
+            <span class="tag">MySQL</span>
+            <span class="tag">SQL</span>
+            <span class="tag">Data Warehousing</span>
+          </div>
+        </div>
+        <div class="skill-card" data-track="swe">
+          <div class="skill-icon">☕</div>
+          <div class="skill-name">Backend Development</div>
+          <div class="track-badge swe-badge">Software Eng</div>
+          <div class="skill-tags">
+            <span class="tag">Java</span>
+            <span class="tag">Spring Boot</span>
+            <span class="tag">Python</span>
+            <span class="tag">PHP CodeIgniter</span>
+            <span class="tag">RESTful APIs</span>
+          </div>
+        </div>
+        <div class="skill-card" data-track="swe">
+          <div class="skill-icon">🖥️</div>
+          <div class="skill-name">Frontend & Reporting</div>
+          <div class="track-badge swe-badge">Software Eng</div>
+          <div class="skill-tags">
+            <span class="tag">Angular</span>
+            <span class="tag">JavaScript</span>
+            <span class="tag">Apache POI</span>
+            <span class="tag">Jasper Reports</span>
+          </div>
+        </div>
+        <div class="skill-card" data-track="swe">
+          <div class="skill-icon">☁️</div>
+          <div class="skill-name">DevOps & Cloud</div>
+          <div class="track-badge swe-badge">Software Eng</div>
+          <div class="skill-tags">
+            <span class="tag">Docker</span>
+            <span class="tag">Kubernetes</span>
+            <span class="tag">CI/CD Pipelines</span>
+            <span class="tag">AWS</span>
+            <span class="tag">Git</span>
+          </div>
+        </div>
+        <div class="skill-card" data-track="swe">
+          <div class="skill-icon">🏗️</div>
+          <div class="skill-name">Architecture & Concepts</div>
+          <div class="track-badge swe-badge">Software Eng</div>
+          <div class="skill-tags">
+            <span class="tag">Microservices</span>
+            <span class="tag">Containerization</span>
+            <span class="tag">Agile / Scrum</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects" class="reveal">
+      <div class="section-label">03 — Projects</div>
+      <h2 class="section-title">What I've built</h2>
+      <div class="projects-list">
+
+        <div class="project-card" data-track="swe">
+          <div>
+            <div class="project-meta"><span class="proj-track swe-badge">Software Eng</span> <span class="proj-track de-badge">Data Eng</span></div>
+            <div class="project-title">MoKlaim — Insurance Claims Platform</div>
+            <p class="project-desc">
+              Maintained and enhanced a legacy claims application built in PHP CodeIgniter,
+              then led the re-architecture to Java Spring Boot and Python microservices.
+              Also maintains the ETL pipelines and data-serving APIs used across multiple
+              business units at BRILife.
+            </p>
+            <div class="project-stack">
+              <span class="stack-chip">Java / Spring Boot</span>
+              <span class="stack-chip">Python</span>
+              <span class="stack-chip">PHP CodeIgniter</span>
+              <span class="stack-chip">PostgreSQL</span>
+              <span class="stack-chip">SSIS</span>
+            </div>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/auvanatthahara" target="_blank">↗ GitHub</a>
+            <span style="font-size:10px;color:var(--muted)">2024 – Present</span>
+          </div>
+        </div>
+
+        <div class="project-card" data-track="swe">
+          <div>
+            <div class="project-meta"><span class="proj-track swe-badge">Software Eng</span></div>
+            <div class="project-title">LinovHR — Enterprise HRIS Platform</div>
+            <p class="project-desc">
+              Built core payroll and HR backend modules consumed by multiple microservices
+              using Spring Boot and Java. Developed responsive Angular 16 interfaces and
+              supported payroll, time, and attendance features for large enterprise clients.
+            </p>
+            <div class="project-stack">
+              <span class="stack-chip">Java / Spring Boot</span>
+              <span class="stack-chip">Angular 16</span>
+              <span class="stack-chip">PostgreSQL</span>
+              <span class="stack-chip">Microservices</span>
+            </div>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/auvanatthahara" target="_blank">↗ GitHub</a>
+            <span style="font-size:10px;color:var(--muted)">2023</span>
+          </div>
+        </div>
+
+        <div class="project-card" data-track="swe">
+          <div>
+            <div class="project-meta"><span class="proj-track swe-badge">Software Eng</span></div>
+            <div class="project-title">Asset Management System</div>
+            <p class="project-desc">
+              Built backend APIs with Spring Boot and PostgreSQL in a microservices
+              architecture, enabling organizations to manage and track physical assets
+              with full audit trail and reporting capabilities.
+            </p>
+            <div class="project-stack">
+              <span class="stack-chip">Spring Boot</span>
+              <span class="stack-chip">PostgreSQL</span>
+              <span class="stack-chip">REST API</span>
+              <span class="stack-chip">Microservices</span>
+            </div>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/auvanatthahara" target="_blank">↗ GitHub</a>
+            <span style="font-size:10px;color:var(--muted)">2023</span>
+          </div>
+        </div>
+
+        <div class="project-card" data-track="swe">
+          <div>
+            <div class="project-meta"><span class="proj-track swe-badge">Software Eng</span></div>
+            <div class="project-title">Indoor Position Tracking (BLE)</div>
+            <p class="project-desc">
+              Implemented an indoor positioning system using Bluetooth Low Energy (BLE)
+              and ESP32 microcontrollers. Built a real-time JavaScript interface to
+              track people's positions indoors — an early foray into IoT and embedded systems.
+            </p>
+            <div class="project-stack">
+              <span class="stack-chip">ESP32</span>
+              <span class="stack-chip">BLE</span>
+              <span class="stack-chip">JavaScript</span>
+              <span class="stack-chip">IoT</span>
+            </div>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/auvanatthahara" target="_blank">↗ GitHub</a>
+            <span style="font-size:10px;color:var(--muted)">2022</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section id="experience" class="reveal">
+      <div class="section-label">04 — Experience</div>
+      <h2 class="section-title">Where I've worked</h2>
+      <div class="exp-list">
+        <div class="exp-item">
+          <div class="exp-date">Jan 2024 — Present</div>
+          <div>
+            <div class="exp-role">Software Engineer</div>
+            <div class="exp-company">PT. Asuransi BRILife</div>
+            <p class="exp-desc">
+              Designs and maintains SSIS ETL workflows to extract, transform, and load
+              insurance transaction data into SQL Server for reporting and analytics.
+              Builds and maintains microservices and REST APIs for the MoKlaim claims platform
+              (Spring Boot, Python, PHP CodeIgniter, PostgreSQL). Containerizes and deploys
+              services with Docker and Kubernetes, and optimizes CI/CD pipelines for
+              improved reliability and faster deployments.
+            </p>
+          </div>
+        </div>
+        <div class="exp-item">
+          <div class="exp-date">Jun 2023 — Jan 2024</div>
+          <div>
+            <div class="exp-role">Software Engineer</div>
+            <div class="exp-company">PT. Lawencon International</div>
+            <p class="exp-desc">
+              Developed backend microservices and REST APIs for enterprise HRIS platforms
+              using Spring Boot and PostgreSQL. Built Angular frontend modules for end-to-end
+              HR workflows. Implemented automated report generation with Apache POI and
+              Jasper Reports. Also completed an intensive internal Data Engineering bootcamp
+              covering ETL, data warehousing, and SQL-based transformation.
+            </p>
+          </div>
+        </div>
+        <div class="exp-item">
+          <div class="exp-date">Sep 2021 — Mar 2022</div>
+          <div>
+            <div class="exp-role">IoT Staff (Intern)</div>
+            <div class="exp-company">PT. Jasa Marga (Persero) Tbk.</div>
+            <p class="exp-desc">
+              Supported maintenance of Single Lane Free Flow (SLFF) tolling systems and
+              assisted in deploying Automatic Vehicle Counting (AVC) systems. Researched
+              and tested STM32-based embedded systems for Electronic Toll Collection (ETC)
+              and helped integrate IoT solutions into large-scale transportation infrastructure.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="reveal">
+      <div class="section-label">05 — Contact</div>
+      <div class="contact-box">
+        <h3>Let's work together</h3>
+        <p>Open to Software Engineering, Data Engineering, or hybrid roles. Happy to chat about microservices, ETL pipelines, or the modern data stack.</p>
+        <a href="mailto:auvanatthahara@gmail.com" class="btn btn-primary" style="margin-bottom:28px; display:inline-flex;">
+          auvanatthahara@gmail.com
+        </a>
+        <div class="contact-links">
+          <a href="https://linkedin.com/in/auvan-atthahara" class="contact-link" target="_blank">
+            ↗ LinkedIn
+          </a>
+          <a href="https://github.com/auvanatthahara" class="contact-link" target="_blank">
+            ↗ GitHub
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      Built with plain HTML · Hosted on GitHub Pages · Auvan Atthahara © 2026
+    </div>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    revealEls.forEach(el => observer.observe(el));
+
+    // Smooth active nav highlight
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(s => {
+        if (window.scrollY >= s.offsetTop - 120) current = s.id;
+      });
+      navLinks.forEach(a => {
+        a.style.color = a.getAttribute('href') === `#${current}` ? 'var(--accent2)' : '';
+      });
+    });
+
+    // Track filter tabs
+    const tabs = document.querySelectorAll('.track-tab');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const track = tab.dataset.track;
+        document.querySelectorAll('.skill-card, .project-card').forEach(card => {
+          if (track === 'all' || card.dataset.track === track) {
+            card.classList.remove('hidden');
+          } else {
+            card.classList.add('hidden');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
